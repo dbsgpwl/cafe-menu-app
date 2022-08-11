@@ -27,6 +27,13 @@ function App(){
             );
             $menuName.innerText = updatedMenuName; 
         }
+
+        if(e.target.classList.contains("menu-remove-button")){
+            if(confirm("정말 삭제하시겠습니까?")){//confirm : 확인버튼 누르면 true를 return, 취소버튼 부르면 false를 return
+              e.target.closest("li").remove();
+            }
+             
+        }
     });
 
 
