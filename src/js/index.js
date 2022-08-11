@@ -15,6 +15,21 @@ $("#espresso-menu-submit-button").addEventListener("click", () => {
 });
 
 function App(){
+    // - [ ] 메뉴의 수정 버튼 클릭 이벤트를 받고, 메뉴 수정하는 모달창(prompt)이 뜬다.
+    // - [ ] 모달창에서 신규메뉴명을 입력 받고, 확인버튼을 누르면 메뉴가 수정된다.
+
+    $("#espresso-menu-list").addEventListener("click", (e) => {
+        if(e.target.classList.contains("menu-edit-button")){
+            const $menuName = e.target.closest("li").querySelector(".menu-name");//return li>span에 있는 menu-name 가져오기  //closest("li") : li 가져오는 기능
+            const updatedMenuName= prompt(
+                "메뉴명을 수정하세요",
+                $menuName.innerText
+            );
+            $menuName.innerText = updatedMenuName; 
+        }
+    });
+
+
     $("#espresso-menu-form") //form 태그가 자동으로 전송되는 것을 막아준다.
         .addEventListener("submit", (e) => {
             e.preventDefault();
@@ -37,7 +52,7 @@ function App(){
                         </button>
                         <button
                         type="button"
-                        class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+                        class="bg-gray-50 text-gray-500 text-sm mr-1 menu-remove-button"
                         >
                         삭제
                         </button>
