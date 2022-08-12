@@ -17,6 +17,12 @@
 // - [x] 확인 버튼을 클릭하면 메뉴가 삭제된다.
 // - [x] 총 메뉴 갯수를 count 하여 상단에 보여준다.
 
+// 얻게 된 인사이트
+// 1. 이벤트 위임을 어떻게 할 수 있는지 알게됨.
+// 2. 요구사항을 전략적으로 접근하는 방법, 단계별로 세세하게 나누는 것이 중요하다는 것을 알게 됨.
+// 3. DDM 요소를 가져올 때는 $표시를 써서 변수처럼 사용할 수 있는게 좋았음.
+// 4. 새롭게 알게 된 매서드 innerText, innerHTML, 총개수 ($), insertAdjacentHTML, closest, e.target ...
+// 5. 웹 개발시, 요구사항들이 비슷한 경우가 많은데 요구사항별 자주 사용되는 매서드, 기능들을 익히게 되었음.
 
 //$ 를 이용하여 querySelector에 들어오는 id값을 받아서  "=> document.querySelector(selector)" 값을 리턴
 const $ = (selector) => document.querySelector(selector);
@@ -33,30 +39,7 @@ function App(){
         $(".menu-count").innerText = `총 ${menuCount} 개`; //innerText : 문자값 바꾸기
 
     }
-    $("#espresso-menu-list").addEventListener("click", (e) => {
-        if(e.target.classList.contains("menu-edit-button")){
-            const $menuName = e.target.closest("li").querySelector(".menu-name");//return li>span에 있는 menu-name 가져오기  //closest("li") : li 가져오는 기능
-            const updatedMenuName= prompt(
-                "메뉴명을 수정하세요",
-                $menuName.innerText
-            );
-            $menuName.innerText = updatedMenuName; 
-        }
 
-        if(e.target.classList.contains("menu-remove-button")){
-            if(confirm("정말 삭제하시겠습니까?")){//confirm : 확인버튼 누르면 true를 return, 취소버튼 부르면 false를 return
-              e.target.closest("li").remove();
-              UpdatemenuCount(); //메뉴 카운트 update
-            }
-             
-        }
-    });
-
-
-    $("#espresso-menu-form") //form 태그가 자동으로 전송되는 것을 막아준다.
-        .addEventListener("submit", (e) => {
-            e.preventDefault();
-        })
     const AddMenuName = () => {
         if($("#espresso-menu-name").value === "") {
             alert("값을 입력해주세요.");
@@ -90,8 +73,8 @@ function App(){
                 // </p>
                 // <!-- afterend -->
 
-                 //innerAdjacentHTML : 태그 시작전, 시작 직후, 태그 끝나기 직전, 태그 끝난 이후
-            $("#espresso-menu-list").insertAdjacentHTML(
+            // 메뉴 추가시, 위에서 아래로 순서대로 추가 표시
+            $("#espresso-menu-list").insertAdjacentHTML(    //innerAdjacentHTML : 태그 시작전, 시작 직후, 태그 끝나기 직전, 태그 끝난 이후
                 'beforeend', menuItemTemplate(espressoMenuName)
             );
             
@@ -103,9 +86,42 @@ function App(){
             
     };
 
-    $("#espresso-menu-submit-button").addEventListener("click", () => {
-        AddMenuName();
-    });  
+    const updateMenuName = (e) => {
+        const $menuName = e.target.closest("li").querySelector(".menu-name");//return li>span에 있는 menu-name 가져오기  //closest("li") : li 가져오는 기능
+        const updatedMenuName= prompt(
+                "메뉴명을 수정하세요",
+                $menuName.innerText
+            );
+            $menuName.innerText = updatedMenuName;
+    }
+
+    const removeMenuName = (e) => {
+        if(confirm("정말 삭제하시겠습니까?")){//confirm : 확인버튼 누르면 true를 return, 취소버튼 부르면 false를 return
+            e.target.closest("li").remove();
+            UpdatemenuCount(); //메뉴 카운트 update
+          }
+    }
+
+    $("#espresso-menu-list").addEventListener("click", (e) => {
+        if(e.target.classList.contains("menu-edit-button")){
+            updateMenuName(e);
+        }
+
+        if(e.target.classList.contains("menu-remove-button")){
+            removeMenuName(e);
+             
+        }
+    });
+
+
+    $("#espresso-menu-form") //form 태그가 자동으로 전송되는 것을 막아준다.
+        .addEventListener("submit", (e) => {
+            e.preventDefault();
+        })
+    
+
+    $("#espresso-menu-submit-button").addEventListener("click",  AddMenuName);
+    
     //메뉴의 이름을 입력 받기    
     $("#espresso-menu-name").addEventListener("keypress", (e) => {
         //input 박스가 빈값일 경우, 빈값이 추가 되지 않도록 Enter 예외 처리
