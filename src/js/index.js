@@ -78,6 +78,9 @@ function App(){
 
     const removeMenuName = (e) => {
         if(confirm("정말 삭제하시겠습니까?")){                                  //confirm : 확인버튼 누르면 true를 return, 취소버튼 부르면 false를 return
+            const menuId = e.target.closest("li").dataset.menuId;    
+            this.menu.splice(menuId, 1);
+            store.setLocalStorage(this.menu);
             e.target.closest("li").remove();
             updateMenuCount();                                                 //메뉴 카운트 update
         }
