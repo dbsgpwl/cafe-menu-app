@@ -16,7 +16,7 @@ function App(){
     // 상태(변할수 있는 데이터), 이 앱에서 변하는 것 : 메뉴명
     //-> 데이터는 꼭 관리해야하는 것만 최소한으로 관리해야함. 그렇지 않으면 복잡한 코드가 됨!
     // 메뉴명은 배열을 통해 저장, 갯수는 배열의 길이를 구하면 손쉽게 구할 수 있음
-    this.menu = [];
+    this.menu = []; //초기화를 해야 어떤 데이터가 들어오는지 명확히 구분가능
 
     const updateMenuCount = () => {
         // 메뉴 카운트   
@@ -28,17 +28,17 @@ function App(){
     const addMenuName = () => {
         if($("#espresso-menu-name").value === "") {
             alert("값을 입력해주세요.");
-            return;  //리턴을 해야 밑에 코드들이 실행되지 않음!
+            return;                                         //리턴을 해야 밑에 코드들이 실행되지 않음!
         }
-                const espressoMenuName = $("#espresso-menu-name").value;
-                this.menu.push({ name : espressoMenuName}); //push 할 때는 메뉴가 하나씩 추가됨
-                store.setLocalStorage(this.menu)
-                const template = this.menu
-                .map((item) => {  //메뉴 아이템별로 화면 마크업 생성을 위해 map 매서드 사용 //item은 파라미터 명!
-                    //각각의 메뉴별 li태그가 있어야 하므로 menu를 순회하며 li 태그 먼저 만들어주고, join 매서드로 만든 li 태그를 하나로 합치기 
-                    return `
-                    <li class="menu-list-item d-flex items-center py-2">
-                        <span class="w-100 pl-2 menu-name">${item.name}</span>
+        const espressoMenuName = $("#espresso-menu-name").value;
+        this.menu.push({name : espressoMenuName});          //push 할 때는 메뉴가 하나씩 추가됨
+        store.setLocalStorage(this.menu);
+        const template = this.menu
+        .map((menuItem, index) => {                         //메뉴 아이템별로 화면 마크업 생성을 위해 map 매서드 사용 //item은 파라미터 명!
+                                                            //각각의 메뉴별 li태그가 있어야 하므로 menu를 순회하며 li 태그 먼저 만들어주고, join 매서드로 만든 li 태그를 하나로 합치기 
+            return `
+                    <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+                        <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
                         <button                             
                             type="button"
                             class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -56,43 +56,31 @@ function App(){
                 .join("");      //join 매서드 문자열을 하나로 합쳐줌! -> 배열형태로 있던 li태그가 하나의 마크업이 될 수 있음. -> 마크업이 되어야 브라우저에 표시가능
                                 // ["<li>~</li>", "<li>~</li>", ...]; --> <li>~</li><li>~</li><li>~</li>
 
-                //  <!-- beforebegin --> 
-                // <p>
-                // <!-- afterbegin -->
-                // foo
-                // <!-- beforeend -->
-                // </p>
-                // <!-- afterend -->
-
             // 메뉴 추가시, 위에서 아래로 순서대로 추가 표시
             // $("#espresso-menu-list").insertAdjacentHTML(    //innerAdjacentHTML : 태그 시작전, 시작 직후, 태그 끝나기 직전, 태그 끝난 이후
             //     'beforeend', menuItemTemplate(espressoMenuName)
             // );
 
             $("#espresso-menu-list").innerHTML = template;
-            
-            
             updateMenuCount();
-
             //input 박스 빈값으로 초기화 하기 -> 스크립트가 순서대로 읽기 때문!
             $("#espresso-menu-name").value = '';
-            
     };
 
     const updateMenuName = (e) => {
-        const $menuName = e.target.closest("li").querySelector(".menu-name");//return li>span에 있는 menu-name 가져오기  //closest("li") : li 가져오는 기능
-        const updatedMenuName= prompt(
-                "메뉴명을 수정하세요",
-                $menuName.innerText
-            );
-            $menuName.innerText = updatedMenuName;
-    }
+        const menuId = e.target.closest("li").dataset.menuId;                   //가장 가까이 있는 부모 li 태그 가져와서, 데이터속성을 dataset이라는 속성으로 접근하여, 속성이 동적으로 만들어져서 menuId 가져올 수 있음
+        const $menuName = e.target.closest("li").querySelector(".menu-name");   //return li>span에 있는 menu-name 가져오기  //closest("li") : li 가져오는 기능
+        const updatedMenuName= prompt("메뉴명을 수정하세요",$menuName.innerText);
+        this.menu[menuId].name = updateMenuName;                                //클릭한 메뉴 item을 index 값으로 찾기!                              //인덱스값의 이름을 수정된 이름으로 바꾸기
+        store.setLocalStorage(this.menu);                                       //localStorage에 수정된 값을 저장!
+        $menuName.innerText = updatedMenuName;
+    };
 
     const removeMenuName = (e) => {
-        if(confirm("정말 삭제하시겠습니까?")){//confirm : 확인버튼 누르면 true를 return, 취소버튼 부르면 false를 return
+        if(confirm("정말 삭제하시겠습니까?")){                                  //confirm : 확인버튼 누르면 true를 return, 취소버튼 부르면 false를 return
             e.target.closest("li").remove();
-            updateMenuCount(); //메뉴 카운트 update
-          }
+            updateMenuCount();                                                 //메뉴 카운트 update
+        }
     }
 
     $("#espresso-menu-list").addEventListener("click", (e) => {
@@ -102,7 +90,6 @@ function App(){
 
         if(e.target.classList.contains("menu-remove-button")){
             removeMenuName(e);
-             
         }
     });
 
